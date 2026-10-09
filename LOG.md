@@ -18,3 +18,16 @@
 - A loyal customer is likely to adjust more to a few shortcomings like the lack of minor perks above, whereas a disloyal customer might be nitpicky.
 - Some niche things depending on the type of travel, leg space might have a correlation. A business travel might prefer more leg room space.
 
+## 2026-10-09
+
+### First checks for EDA
+- Need to first observe which columns are categorical
+- Found out that for `departure delay in minutes`, around 90.78% of departures have zero recorded delay; the distribution has a long right tail. Whether using a binary indicator (delay or not) adds predictive value or not; to test its relationship with satisfaction.
+- Business travel is more prevalent among passengers aged 20–59, while personal travel is more prevalent among passengers under 20 and those aged 60 or older.
+- Satisfaction decreases as delay increases but even among passengers with zero departure delay, 55.20% are not satisfied. Departure punctuality alone does not explain passenger satisfaction.
+- Arrival delays are associated with lower satisfaction than departure delays for some delay groups.
+- Food and drink, seat comfort, inflight entertainment, on-board service, leg room, baggage handling, check-in service, cleanliness *generally increasing*
+- Inflight Wi-Fi, online booking, gate location, online boarding are *non-monotonic*
+- Departure/Arrival Time convenient is insconsistent
+- Baggage handling has no 0 rating, meaning it is mandatory or made to look mandatory
+- Several service ratings have strong associations with satisfaction, with notable nonlinearities and exceptions.
