@@ -31,3 +31,14 @@
 - Departure/Arrival Time convenient is insconsistent
 - Baggage handling has no 0 rating, meaning it is mandatory or made to look mandatory
 - Several service ratings have strong associations with satisfaction, with notable nonlinearities and exceptions.
+
+## 2026-10-10
+
+### Final EDA for the day before next phase
+- Loyal customers show more satisfaction than disloyal customers
+- Disloyal customers are much less likely to be satisfied when Wi-Fi ratings are low whereas loyal customers show comparatively higher satisfaction even at low Wi-Fi ratings.
+- I want to be able to examine all 13 service features amongst loyal and disloyal customers. We introduce "gap", the average satisfaction of high ratings (4-5) minus the avg satisfaction of low ratings (1-3). Then compare the gap between loyal and disloyal customers.
+- 0 rating is excluded but later, we can engineer a feature accounting users who did not rate at all.
+- Across most service features and rating levels, loyal customers generally have higher satisfaction. The relationship between service ratings and satisfaction differs across customer types and features, with some exceptions at the highest rating.
+- Travel purpose has a large association with satisfaction. Business travellers have higher satisfaction rates in every class.
+- Within business travel, class matters descriptively. Business-class passengers have a much higher satisfaction rate than Eco and Eco Plus passengers. Within personal travel, satisfaction remains low across all three classes.
