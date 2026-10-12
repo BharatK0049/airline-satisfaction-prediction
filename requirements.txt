@@ -7,3 +7,4 @@ kagglehub
 lightgbm
 jupyter
 kagglehub
+kaggle
