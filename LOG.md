@@ -83,3 +83,6 @@ True Positives: 54,259
 Class 0 (Dissatisfied): Precision 0.90, Recall 0.90, F1-score 0.90.
 
 Class 1 (Satisfied): Precision 0.88, Recall 0.87, F1-score 0.88.
+
+First submission: 0.75987 (Did not scale)
+Second submission: 0.94031 (Scaled)
