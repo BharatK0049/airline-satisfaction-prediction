@@ -42,3 +42,44 @@
 - Across most service features and rating levels, loyal customers generally have higher satisfaction. The relationship between service ratings and satisfaction differs across customer types and features, with some exceptions at the highest rating.
 - Travel purpose has a large association with satisfaction. Business travellers have higher satisfaction rates in every class.
 - Within business travel, class matters descriptively. Business-class passengers have a much higher satisfaction rate than Eco and Eco Plus passengers. Within personal travel, satisfaction remains low across all three classes.
+
+## 2026-12-10
+
+### Next step - Creating the baseline
+- First, a simple baseline with some basic preprocessing and feature engineering for the model to make a prediction
+- Arrival Delay in Minutes was the only feature with missing values (292 rows). The median calculated from the training split was 0.
+- One hot encoded nominal categories - gender, customer type, class and type of travel.
+- Despite class having a hierarchy between the classes, Business-class passengers travelling for business had 73.25% satisfaction, compared with 11.19% among personal travellers in Business class. This suggests class should not be assumed to have a simple, equally spaced relationship with satisfaction.
+- Created a binary _unrated indicator for each rating column in both training and validation
+- Considered replacing unrated zeros with NaN and imputing them using the median of rated observations in the training split.
+- same training-derived median would be used for both training and validation data to prevent validation leakage.
+- Keeping the _unrated indicators would preserve the distinction between a genuine rating and an imputed value.
+- validation set is supposed to simulate unseen data. We want to learn our preprocessing rules from training data and apply those same rules to validation data, so it is imputed with learnt data.
+- All numeric columns on different scales, decided to use StandardScaler for baseline.
+- Investigated potential outliers using box plots. For departure delay, Q1 = 0, Q3 = 0, and IQR = 0, making the conventional IQR outlier threshold uninformative for this zero-heavy distribution.
+
+### Concerns
+- Why class is not encoded ordinally with ranking
+- whether imputing a rating while retaining an unrated flag could confuse logistic regression about which value to trust.
+- delay features still had highly skewed distributions after scaling. The 25th percentile, median, and 75th percentile were all approximately -0.20, while maximum scaled values exceeded 80.
+
+### Results
+Validation Results
+
+ROC-AUC: 0.9398
+
+Accuracy: 89.13%
+
+Confusion Matrix:
+
+True Negatives: 70,456
+
+False Positives: 7,403
+
+False Negatives: 7,809
+
+True Positives: 54,259
+
+Class 0 (Dissatisfied): Precision 0.90, Recall 0.90, F1-score 0.90.
+
+Class 1 (Satisfied): Precision 0.88, Recall 0.87, F1-score 0.88.
