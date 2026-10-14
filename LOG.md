@@ -86,3 +86,31 @@ Class 1 (Satisfied): Precision 0.88, Recall 0.87, F1-score 0.88.
 
 First submission: 0.75987 (Did not scale)
 Second submission: 0.94031 (Scaled)
+
+## 2026-13-10
+
+- One hot encoding all feature ratings and making 91 columns improves validation auc by a small amount.
+- Validation AUC: 0.9476
+- Validation Accuracy: 0.9085
+
+Confusion Matrix:
+[[72001  5858]
+ [ 6946 55122]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.91      0.92      0.92     77859
+           1       0.90      0.89      0.90     62068
+
+    accuracy                           0.91    139927
+   macro avg       0.91      0.91      0.91    139927
+weighted avg       0.91      0.91      0.91    139927
+
+Leaderboard score: 0.94799
+
+## 2026-14-10
+
+- Updated codebase with new codefiles with helper functions.
+- Removed common.py
+- Made workflow modular
