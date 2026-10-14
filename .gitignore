@@ -1,7 +1,6 @@
 .venv/
 data/
 models/
-outputs/
 submissions/
 __pycache__/
 *.pyc
