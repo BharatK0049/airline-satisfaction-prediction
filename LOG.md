@@ -114,3 +114,34 @@ Leaderboard score: 0.94799
 - Updated codebase with new codefiles with helper functions.
 - Removed common.py
 - Made workflow modular
+
+## 2026-21-26
+- Created decision Tree classifier, max performance caps at max_depth = 12.
+- Score was 0.94446. Did not beat the benchmark.
+
+| Model | Training ROC-AUC | Testing ROC-AUC |
+|---|---:|---:|
+| Logistic Regression (One-Hot Ratings) | 0.9489 | **0.94799** |
+| Decision Tree (max_depth=12, One-Hot Ratings) | 0.9539 | 0.94446 |
+
+Observation: Logistic regression achieves a higher validation ROC-AUC (0.9476 vs. 0.9446), despite having a slightly lower training ROC-AUC. This suggests better generalization on the validation split, while the decision tree shows a larger training-validation gap.
+
+Also for why not use KNN or SVM is because there are too many features for KNN to check for distance and SVM uses kernels and hyperparameters which are expensive for large datasets.
+
+Used a RandomForestClassifier model with parameters - 200 n_estimators, max_depth 12, "min_samples_leaf": 2, "max_features": "sqrt", "random_state": SEED, "n_jobs": -1
+
+RandomForest - Training ROC-AUC: 0.9583; Testing ROC-AUC: 0.95379
+
+RandomForestClassifier when fed with Service Features without one hot encoding showed improvement in performance.
+Scaling not needed in Random Forest as it barely matters.
+
+Finally Results so far:
+
+| Model | Configuration | Training ROC-AUC | Validation ROC-AUC | Kaggle Score |
+|---|---|---:|---:|---:|
+| Logistic Regression | One-hot encoded ratings | 0.9489 | 0.9476 | 0.94799 |
+| Decision Tree | One-hot encoded ratings, `max_depth=12` | 0.9539 | 0.9446 | 0.94446 |
+| Random Forest | One-hot ratings, 200 trees, `max_depth=12`, `min_samples_leaf=2` | 0.9583 | 0.9533 | 0.95379 |
+| **Random Forest 2** | **Numeric ratings, 200 trees, `max_depth=12`, `min_samples_leaf=2`** | **0.9597** | **0.9544** | **0.95486** |
+
+Observation - Random Forest with numerically encoded service ratings currently performs best, achieving a validation ROC-AUC of 0.9544 and a Kaggle score of 0.95486. Compared with one-hot-encoded ratings, numeric encoding improved validation ROC-AUC by 0.0011 and Kaggle score by 0.00107, with the same model configuration. This suggests numeric encoding is a promising representation for Random Forest on this dataset.
