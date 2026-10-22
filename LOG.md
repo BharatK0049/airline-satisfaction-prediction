@@ -115,7 +115,7 @@ Leaderboard score: 0.94799
 - Removed common.py
 - Made workflow modular
 
-## 2026-21-26
+## 2026-21-10
 - Created decision Tree classifier, max performance caps at max_depth = 12.
 - Score was 0.94446. Did not beat the benchmark.
 
@@ -145,3 +145,19 @@ Finally Results so far:
 | **Random Forest 2** | **Numeric ratings, 200 trees, `max_depth=12`, `min_samples_leaf=2`** | **0.9597** | **0.9544** | **0.95486** |
 
 Observation - Random Forest with numerically encoded service ratings currently performs best, achieving a validation ROC-AUC of 0.9544 and a Kaggle score of 0.95486. Compared with one-hot-encoded ratings, numeric encoding improved validation ROC-AUC by 0.0011 and Kaggle score by 0.00107, with the same model configuration. This suggests numeric encoding is a promising representation for Random Forest on this dataset.
+
+## 2026-22-10
+
+- Created two model submissions for LightGBM Classifier, one with numeric and one hot encoding of service ratings.
+- Improvements seen from RandomForest Classifier, with numeric being the best so far.
+- Took the same two configurations and removed scaling and numeric no scaling was the best so far.
+
+| Model    | Configuration                                                | Training ROC-AUC | Validation ROC-AUC | Kaggle Score |
+| -------- | ------------------------------------------------------------ | ---------------- | ------------------ | ------------ |
+| LightGBM | Service ratings numerically encoded; numeric features scaled | 0.9629           | 0.9574             | 0.95763      |
+| LightGBM | Service ratings one-hot encoded; numeric features scaled     | 0.9629           | 0.9573             | 0.95748      |
+| LightGBM | Service ratings numerically encoded; no scaling              | 0.9628           | 0.9573             | 0.95786      |
+| LightGBM | Service ratings one-hot encoded; no scaling                  | 0.9628           | 0.9573             | 0.95741      |
+
+Observation: The numerical-encoding, no-scaling configuration achieved the highest Kaggle score of 0.95786. The results suggest that scaling has little effect on LightGBM's validation performance, while the encoding and scaling variations produce small differences in Kaggle scores.
+Also, stick to numeric no scaling configuration here on, that produces the best result.
