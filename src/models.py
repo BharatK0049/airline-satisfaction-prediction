@@ -1,7 +1,7 @@
 """Model factories. Add new models here so notebooks never build them inline."""
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.pipeline import Pipeline
+from lightgbm import LGBMClassifier
 
 from .config import SEED
 # from .preprocessing import build_preprocessor
@@ -24,6 +24,14 @@ def make_random_forest(**kwargs):
     params.update(kwargs)
     return RandomForestClassifier(**params)
 
-# def make_pipeline(model, rating_mode="numeric"):
-#     """Full pipeline: raw dataframe in, probability out."""
-#     return Pipeline([("prep", build_preprocessor(rating_mode)), ("model", model)])
+def make_lightgbm(**kwargs):
+    params = {
+        "n_estimators": 500,
+        "learning_rate": 0.05,
+        "num_leaves": 31,
+        "random_state": SEED,
+        "n_jobs": -1,
+        "verbose": -1,      
+    }
+    params.update(kwargs)
+    return LGBMClassifier(**params)
