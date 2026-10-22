@@ -5,6 +5,7 @@ matplotlib
 seaborn
 kagglehub
 lightgbm
+xgboost
 jupyter
 kagglehub
 kaggle
