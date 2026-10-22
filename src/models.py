@@ -2,6 +2,7 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from lightgbm import LGBMClassifier
+from xgboost import XGBClassifier
 
 from .config import SEED
 # from .preprocessing import build_preprocessor
@@ -35,3 +36,15 @@ def make_lightgbm(**kwargs):
     }
     params.update(kwargs)
     return LGBMClassifier(**params)
+
+def make_xgboost(**kwargs):
+    params = {
+        "n_estimators": 500,
+        "learning_rate": 0.05,
+        "max_depth": 6,
+        "random_state": SEED,
+        "n_jobs": -1,
+        "eval_metric": "auc",
+    }
+    params.update(kwargs)
+    return XGBClassifier(**params)
