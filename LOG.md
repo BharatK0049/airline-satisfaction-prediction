@@ -158,6 +158,8 @@ Observation - Random Forest with numerically encoded service ratings currently p
 | LightGBM | Service ratings one-hot encoded; numeric features scaled     | 0.9629           | 0.9573             | 0.95748      |
 | LightGBM | Service ratings numerically encoded; no scaling              | 0.9628           | 0.9573             | 0.95786      |
 | LightGBM | Service ratings one-hot encoded; no scaling                  | 0.9628           | 0.9573             | 0.95741      |
+| XGBoost  | Service ratings numerically encoded; no scaling              | 0.9630           | 0.9572             | 0.95744      |
 
 Observation: The numerical-encoding, no-scaling configuration achieved the highest Kaggle score of 0.95786. The results suggest that scaling has little effect on LightGBM's validation performance, while the encoding and scaling variations produce small differences in Kaggle scores.
 Also, stick to numeric no scaling configuration here on, that produces the best result.
+XGBoost, LightGBM are saturating in performance, which suggests that changing model isn't the option. Catboost would be optional.
