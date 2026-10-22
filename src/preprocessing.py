@@ -5,7 +5,7 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from .config import NOMINAL_COLS, NUMERIC_COLS, RATING_COLS   # use your own import style
 
 
-def learn_preprocessing(X_tr, ratings="onehot"):
+def learn_preprocessing(X_tr, ratings="onehot", scaling="yes"):
     """Learn everything from TRAINING data only. Returns a dict of learned things."""
     state = {"ratings": ratings}
 
@@ -20,7 +20,8 @@ def learn_preprocessing(X_tr, ratings="onehot"):
     state["nominal_encoder"] = OneHotEncoder(handle_unknown="ignore", sparse_output=False).fit(X_tr[NOMINAL_COLS])
 
     state["numeric_medians"] = X_tr[NUMERIC_COLS].median()
-    state["scaler"] = StandardScaler().fit(X_tr[NUMERIC_COLS].fillna(state["numeric_medians"]))
+    if scaling == "yes":
+        state["scaler"] = StandardScaler().fit(X_tr[NUMERIC_COLS].fillna(state["numeric_medians"]))
     return state
 
 
@@ -37,6 +38,12 @@ def apply_preprocessing(X, state):
     nominal = pd.DataFrame(enc.transform(X[NOMINAL_COLS]), columns=enc.get_feature_names_out(NOMINAL_COLS), index=X.index)
 
     numeric = X[NUMERIC_COLS].fillna(state["numeric_medians"])
-    numeric = pd.DataFrame(state["scaler"].transform(numeric), columns=NUMERIC_COLS, index=X.index)
+
+    if "scaler" in state:
+        numeric = pd.DataFrame(
+            state["scaler"].transform(numeric),
+            columns=NUMERIC_COLS,
+            index=X.index
+        )
 
     return pd.concat([ratings, unrated, nominal, numeric], axis=1)
