@@ -6,3 +6,5 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 catboost_info/
+notebooks/10_CrossFold.ipynb
+notebooks/11_CV_Submission.ipynb
