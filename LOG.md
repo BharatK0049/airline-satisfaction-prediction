@@ -194,3 +194,43 @@ XGBoost, LightGBM are saturating in performance, which suggests that changing mo
 
 ### Takeaway
 - Tuning, blending and extra models all plateaued around 0.958, consistent with the earlier error analysis (errors spread evenly, no weak segment).
+
+## 2026-11-01
+
+### Final result
+- Final private score: **0.95900**, rank **2955** (down 184 places from the public leaderboard standing).
+- Final submission used: <confirm which file>.
+- The public score of my best models was 0.95800, and the CV mean for LightGBM was 0.95855, so CV was a reliable guide. The drop in rank came from the shake-up: scores were clustered so tightly that the gaps between ranks were in the fifth decimal place.
+
+### Results by experiment
+
+| Experiment | Validation AUC | Leaderboard |
+|---|---|---|
+| Logistic regression, numeric ratings (baseline) | 0.9398 | 0.94031 |
+| Logistic regression, one-hot ratings | 0.9476 | 0.94799 |
+| Decision tree (max_depth 12) | 0.9446 | - |
+| Random Forest | 0.9544 | - |
+| XGBoost | 0.9572 | 0.95744 |
+| LightGBM (num_leaves=63, lr=0.025) | 0.9576 (CV mean 0.95855) | 0.95800 |
+| LightGBM + XGBoost average | 0.95767 | 0.95800 |
+| CatBoost | <fill in> | <fill in> |
+
+### Conclusion
+- The biggest gains came early: one-hot encoding the ratings (+0.0078) and moving from logistic regression to boosted trees (+0.010). Everything after that, including tuning, blending and extra models, plateaued around 0.958.
+- Error analysis showed the errors were spread evenly across passenger groups, with no weak segment, so there was no single feature to fix. The `mean_rating` feature gave no gain either.
+- Blending LightGBM with XGBoost gave no real improvement (+0.00007, inside the noise), and adding Random Forest or logistic regression made the average worse. Equal-weight averaging can't discount a weaker model, and the tree models made too similar mistakes.
+- Stacking with OOF predictions needs models that make different mistakes. Mine were mostly tree-based, so there wasn't much diversity to use.
+- Not explored: <confirm, e.g. the original dataset, stacking with a learned meta-model>.
+
+### What I'd do differently
+- Write the preprocessing and the cross-validation loop myself before using helper functions.
+- Learn cross-fold CV and OOF predictions properly, then use them from the start.
+- Practise explaining each result in my own words before moving on.
+
+### Final cleaning
+- Tagged the full state as `competition-final` before deleting anything, so it can be restored.
+- Removed `10_CrossFold` and `11_CV_Submission` from the repo (files kept locally, added to `.gitignore`).
+- Removed `cross_validate` and `get_oof_predictions` from `src/evaluate.py`.
+- Stopped tracking `notebooks/catboost_info/` (CatBoost training logs).
+- `12_ensemble`: <confirm: dropped from the repo, or kept>. It imports `get_oof_predictions`, so it won't run unless that function is restored.
+- Repo is clean and not yet pushed. Remaining: README, then publish to GitHub.
