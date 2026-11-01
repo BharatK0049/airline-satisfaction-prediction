@@ -163,3 +163,34 @@ Observation - Random Forest with numerically encoded service ratings currently p
 Observation: The numerical-encoding, no-scaling configuration achieved the highest Kaggle score of 0.95786. The results suggest that scaling has little effect on LightGBM's validation performance, while the encoding and scaling variations produce small differences in Kaggle scores.
 Also, stick to numeric no scaling configuration here on, that produces the best result.
 XGBoost, LightGBM are saturating in performance, which suggests that changing model isn't the option. Catboost would be optional.
+
+## 2026-10-31
+
+### Ensembling (12_ensemble)
+- Candidates: LightGBM (num_leaves=63, lr=0.025), XGBoost, Random Forest (numeric ratings), logistic regression (one-hot ratings). Each model was fed data prepared with its own saved `state`.
+- Validation ROC-AUC of equal-weight averages:
+
+| Blend | AUC |
+|---|---|
+| LightGBM alone | 0.9576 |
+| LightGBM + XGBoost | 0.95767 |
+| LightGBM + Random Forest | 0.95646 |
+| LightGBM + XGBoost + Random Forest | 0.95697 |
+| All four (with logistic regression) | 0.9558 |
+
+- LightGBM + XGBoost improved by +0.00007, which is inside fold-to-fold noise (~0.0006), so no real gain. Both are boosted trees on the same features, so their predictions are very similar.
+- Random Forest and logistic regression pulled the average down: an equal-weight average gives a weaker model the same vote as a stronger one, and their mistakes weren't different enough to compensate.
+- Submitted the LightGBM + XGBoost average: leaderboard 0.95800, the same as the best single LightGBM. Conclusion: blending these models gave nothing.
+
+### OOF predictions
+- Goal: collect out-of-fold predictions (each training row predicted by a fold model that never saw it) to build a stacked model.
+- Ran LightGBM through 5-fold OOF. Pooled OOF AUC: <fill in>.
+- Learned: stacking only helps with diverse models (different mistakes), and OOF predictions are what keep the stack's weights honest. With only tree-based models there wasn't much diversity to exploit.
+
+### CatBoost (13_catboost)
+- Same numeric-rating preprocessing as the other tree models, so any difference comes from the model. Settings: <confirm: iterations / learning_rate / depth>.
+- Validation ROC-AUC: <fill in>. Leaderboard: <fill in>.
+- Compared with LightGBM (0.9576 validation, 0.95800 leaderboard) and XGBoost (0.9572 validation, 0.95744 leaderboard).
+
+### Takeaway
+- Tuning, blending and extra models all plateaued around 0.958, consistent with the earlier error analysis (errors spread evenly, no weak segment).
