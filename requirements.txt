@@ -6,6 +6,7 @@ seaborn
 kagglehub
 lightgbm
 xgboost
+catboost
 jupyter
 kagglehub
 kaggle

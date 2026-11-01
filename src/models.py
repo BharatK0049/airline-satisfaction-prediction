@@ -3,13 +3,17 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
+from catboost import CatBoostClassifier
 
 from .config import SEED
 # from .preprocessing import build_preprocessor
 
 
 def make_logreg(**kwargs):
-    params = {"max_iter": 1000, "random_state": SEED}
+    params = {
+        "max_iter": 1000, 
+        "random_state": SEED
+    }
     params.update(kwargs)
     return LogisticRegression(**params)
 
@@ -48,3 +52,14 @@ def make_xgboost(**kwargs):
     }
     params.update(kwargs)
     return XGBClassifier(**params)
+
+def make_catboost(**kwargs):
+    params = {
+        "iterations": 500,
+        "learning_rate": 0.05,
+        "depth": 6,
+        "random_seed": SEED,
+        "verbose": False,
+    }
+    params.update(kwargs)
+    return CatBoostClassifier(**params)

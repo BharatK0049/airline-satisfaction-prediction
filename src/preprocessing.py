@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from .config import NOMINAL_COLS, NUMERIC_COLS, RATING_COLS   # use your own import style
+from .config import NOMINAL_COLS, NUMERIC_COLS, RATING_COLS
 
 
 def learn_preprocessing(X_tr, ratings="onehot", scaling="yes"):
@@ -47,3 +47,4 @@ def apply_preprocessing(X, state):
         )
 
     return pd.concat([ratings, unrated, nominal, numeric], axis=1)
+

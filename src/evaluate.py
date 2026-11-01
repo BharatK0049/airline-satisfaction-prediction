@@ -3,13 +3,14 @@ from datetime import datetime
 
 import joblib
 import pandas as pd
+import numpy as np
 from sklearn.metrics import (
     accuracy_score, classification_report, confusion_matrix, roc_auc_score,
 )
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 from .config import EXPERIMENT_LOG, MODEL_DIR, SEED
-
+from .preprocessing import learn_preprocessing, apply_preprocessing
 
 def report(pipeline, X_val, y_val):
     """Print the validation report; return ROC-AUC (the competition metric)."""
@@ -22,34 +23,48 @@ def report(pipeline, X_val, y_val):
     print(classification_report(y_val, pred))
     return auc
 
-# def cv_auc(pipeline, X, y, n_splits=5):
-#     """Stratified k-fold ROC-AUC. Returns (mean, std). Pipeline is refit per fold."""
-#     cv = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=SEED)
-#     scores = cross_val_score(pipeline, X, y, cv=cv, scoring="roc_auc", n_jobs=1)
-#     return scores.mean(), scores.std()
+def cross_validate(X, y, make_model, n_splits=5):
+    sk_fold = StratifiedKFold(n_splits=n_splits, random_state = SEED, shuffle=True)
+    scores = []
+
+    for fold, (tr_idx, val_idx) in enumerate(sk_fold.split(X, y), start=1):
+        X_tr, X_val = X.iloc[tr_idx], X.iloc[val_idx]
+        y_tr, y_val = y.iloc[tr_idx], y.iloc[val_idx]
+
+        state = learn_preprocessing(X_tr, ratings="numeric", scaling="no")
+        X_tr_enc = apply_preprocessing(X_tr, state)
+        X_val_enc = apply_preprocessing(X_val, state)
+
+        model = make_model()
+        model.fit(X_tr_enc, y_tr)
+
+        auc = roc_auc_score(y_val, model.predict_proba(X_val_enc)[:, 1])
+        scores.append(auc)
+        print(f"Fold {fold}: {auc:.5f}")
+
+    print(f"Mean: {np.mean(scores):.5f}  Std: {np.std(scores):.5f}")
+    return scores
 
 
-# def log_result(name, val_auc, cv_mean=None, cv_std=None, lb=None, notes=""):
-#     """Append one row to experiments/results.csv (creates it if missing)."""
-#     row = pd.DataFrame([{
-#         "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-#         "experiment": name,
-#         "val_auc": round(val_auc, 5),
-#         "cv_auc_mean": None if cv_mean is None else round(cv_mean, 5),
-#         "cv_auc_std": None if cv_std is None else round(cv_std, 5),
-#         "leaderboard": lb,
-#         "notes": notes,
-#     }])
-#     EXPERIMENT_LOG.parent.mkdir(parents=True, exist_ok=True)
-#     row.to_csv(EXPERIMENT_LOG, mode="a", header=not EXPERIMENT_LOG.exists(), index=False)
+def get_oof_predictions(make_model, X, y, X_test, ratings="numeric", n_splits=5):
+    """Out-of-fold predictions for the train rows, fold-averaged predictions for the test rows."""
+    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=SEED)
+    oof = np.zeros(len(X))
+    test_pred = np.zeros(len(X_test))
 
+    for fold, (tr_idx, val_idx) in enumerate(skf.split(X, y), start=1):
+        X_tr, X_val = X.iloc[tr_idx], X.iloc[val_idx]
+        y_tr, y_val = y.iloc[tr_idx], y.iloc[val_idx]
 
-# def run_experiment(name, pipeline, X_tr, y_tr, X_val, y_val, notes="", save=True):
-#     """Fit -> report -> save one artifact -> log. Returns validation AUC."""
-#     pipeline.fit(X_tr, y_tr)
-#     auc = report(pipeline, X_val, y_val)
-#     if save:
-#         MODEL_DIR.mkdir(parents=True, exist_ok=True)
-#         joblib.dump(pipeline, MODEL_DIR / f"{name}.joblib")
-#     log_result(name, auc, notes=notes)
-#     return auc
+        # learn preprocessing from this fold's training rows only
+        state = learn_preprocessing(X_tr, ratings=ratings)
+        model = make_model()
+        model.fit(apply_preprocessing(X_tr, state), y_tr)
+
+        oof[val_idx] = model.predict_proba(apply_preprocessing(X_val, state))[:, 1]
+        test_pred += model.predict_proba(apply_preprocessing(X_test, state))[:, 1] / n_splits
+
+        print(f"fold {fold}: AUC = {roc_auc_score(y_val, oof[val_idx]):.5f}")
+
+    print(f"pooled OOF AUC = {roc_auc_score(y, oof):.5f}")
+    return oof, test_pred
