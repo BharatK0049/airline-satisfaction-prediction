@@ -208,19 +208,19 @@ XGBoost, LightGBM are saturating in performance, which suggests that changing mo
 |---|---|---|
 | Logistic regression, numeric ratings (baseline) | 0.9398 | 0.94031 |
 | Logistic regression, one-hot ratings | 0.9476 | 0.94799 |
-| Decision tree (max_depth 12) | 0.9446 | - |
-| Random Forest | 0.9544 | - |
+| Decision tree (max_depth 12) | 0.9446 | 0.94446 |
+| Random Forest | 0.9544 | 0.95379 |
 | XGBoost | 0.9572 | 0.95744 |
 | LightGBM (num_leaves=63, lr=0.025) | 0.9576 (CV mean 0.95855) | 0.95800 |
 | LightGBM + XGBoost average | 0.95767 | 0.95800 |
-| CatBoost | <fill in> | <fill in> |
+| CatBoost | 0.9566 | 0.95710 |
 
 ### Conclusion
 - The biggest gains came early: one-hot encoding the ratings (+0.0078) and moving from logistic regression to boosted trees (+0.010). Everything after that, including tuning, blending and extra models, plateaued around 0.958.
 - Error analysis showed the errors were spread evenly across passenger groups, with no weak segment, so there was no single feature to fix. The `mean_rating` feature gave no gain either.
 - Blending LightGBM with XGBoost gave no real improvement (+0.00007, inside the noise), and adding Random Forest or logistic regression made the average worse. Equal-weight averaging can't discount a weaker model, and the tree models made too similar mistakes.
 - Stacking with OOF predictions needs models that make different mistakes. Mine were mostly tree-based, so there wasn't much diversity to use.
-- Not explored: <confirm, e.g. the original dataset, stacking with a learned meta-model>.
+- Not explored: the original dataset, stacking with a learned meta-model.
 
 ### What I'd do differently
 - Write the preprocessing and the cross-validation loop myself before using helper functions.
@@ -232,5 +232,7 @@ XGBoost, LightGBM are saturating in performance, which suggests that changing mo
 - Removed `10_CrossFold` and `11_CV_Submission` from the repo (files kept locally, added to `.gitignore`).
 - Removed `cross_validate` and `get_oof_predictions` from `src/evaluate.py`.
 - Stopped tracking `notebooks/catboost_info/` (CatBoost training logs).
-- `12_ensemble`: <confirm: dropped from the repo, or kept>. It imports `get_oof_predictions`, so it won't run unless that function is restored.
+- `12_ensemble`: dropped from the repo. It imports `get_oof_predictions`, so it won't run unless that function is restored.
 - Repo is clean and not yet pushed. Remaining: README, then publish to GitHub.
+
+Upon checking the private leaderboard, had I picked xgb+lgbm blend, I could've gotten a score of 0.95911 instead of 0.95900 as my final leaderboard score. 
